@@ -5,12 +5,6 @@ var 	_models,
 		currentTrack,
 		currentTab;
 
-/*
-TODO:
-	prototype for tabs
-	parse out tresults
-	display tab!
-*/
 
 // launch app when jQuery and Spotify are loaded
 $(document).ready(function () {
@@ -36,6 +30,27 @@ $(document).ready(function () {
 		_throbber = throbber.forElement($('#view-tabs')[0]);
 		
 		init();
+	});
+	
+	$(window).resize(function() {
+		// refresh sizes?
+	});
+	
+	$("#search_form").submit(function() {
+		var artist = $('#input_artist').val();
+		var track = $('#input_track').val();
+		search_songsterr(track, artist);
+		// update localStorage to remember the new preferences for search
+		if(currentTrack.artists[0].name !== artist)
+			localStorage.setItem(currentTrack.artists[0].name, artist);
+		if(currentTrack.name != track)
+			localStorage.setItem(currentTrack.artists[0].name+'_'+
+				currentTrack.name, track)
+		return false;
+	});
+	
+	$('#preferred_version input[type=radio]').click(function() {
+		localStorage.setItem('preferred_version', $(this).val());
 	});
 });
 
@@ -71,6 +86,12 @@ function init() {
 		else
 			alert('no chords for this song');
 	});
+	
+	// set the radio button for preferences
+	var pref = localStorage.getItem('preferred_version');
+	if(pref)
+		$('#preferred_version input[value='+pref+']').prop('checked', true);
+		
 }
 
 // update the html display for the track, fill and submit the form
@@ -78,8 +99,17 @@ function updateTrack() {
 	clearHTML();
 	var name = currentTrack.name;
 	var artist = currentTrack.artists[0].name;	// only first artist listed
+	// check localStorage for preferred search names
+	var storage_artist = localStorage.getItem(artist);
+	var storage_track = localStorage.getItem(artist+'_'+name);
+	if(storage_artist)
+		artist = storage_artist
+	if(storage_track)
+		name = storage_track
 	$('#song_name').val(name);
 	$('#band_name').val(artist);
+	$('#input_track').val(name);
+	$('#input_artist').val(artist);
 	search_songsterr(name, artist);
 }
 
@@ -102,7 +132,9 @@ function search_songsterr(song, artist) {
 	
 	currentTab = new Tab(song, artist, url);
 	// use the preference defined in settings tab
-	var pref = $('input[type=radio][name=version]:checked').val();
+	var pref = localStorage.getItem('preferred_version');
+	if(!pref)
+		pref = $('#preferred_version input[type=radio]').first().val();
 	currentTab.load(pref);
 
 } 
@@ -113,7 +145,6 @@ function clearHTML(msg) {
 	$('#tresults tbody').empty();
 	$('#tabLink').text('');
 	$('#tab').text(msg);
-	
 	doneLoading();
 }
 

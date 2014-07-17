@@ -23,6 +23,11 @@
 			<a id="textTab"> Text Tabs </a> | 
 			<a id="chords"> Chords </a>
 		</span>
+		<form id="search_form">
+			Track:	<input type="text" id="input_track" />
+			Artist: <input type="text" id="input_artist" />
+			<input type="submit" />
+		</form>
 		<div id="results"></div>
 	</div>
 	
@@ -30,8 +35,10 @@
 		<h1> Manage Settings </h1>
 		
 		<h3> Preferred Version </h3>
-		<input type="radio" name="version" value="chords" checked="checked"> Chords 
-		<input type="radio" name="version" value="text"> Text	
+		<div id="preferred_version">
+			<input type="radio" name="version" value="chords" checked="checked"> Chords 
+			<input type="radio" name="version" value="text"> Text	
+		</div>
 	</div>
 	
 	<div id="view-favorites">
